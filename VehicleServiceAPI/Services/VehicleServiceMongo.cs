@@ -9,7 +9,7 @@ public class VehicleServiceMongo : IVehicleService
     public VehicleServiceMongo(IConfiguration configuration)
     {
         string connectionString = configuration["connectionstring"] ?? String.Empty;
-        
+
         var mongoDatabase = new MongoClient(connectionString).GetDatabase("qgt_db");
 
         _collection = mongoDatabase.GetCollection<Vehicle>("vehicle_collection");
@@ -24,19 +24,38 @@ public class VehicleServiceMongo : IVehicleService
     public async Task<Vehicle?> GetVehicle(string registrationNumber) =>
         await _collection.Find(x => x.RegistrationNumber == registrationNumber).FirstOrDefaultAsync();
 
-    public async Task<List<ImageRecord>> PutImageVehicle(List<ImageRecord> imageRecords, string registrationNumber) {
+    public async Task<List<ImageRecord>> PutImageVehicle(List<ImageRecord> imageRecords, string registrationNumber)
+    {
         var vehicle = await _collection.Find(x => x.RegistrationNumber == registrationNumber).FirstOrDefaultAsync();
         vehicle.ImageRecords.AddRange(imageRecords);
         return imageRecords;
     }
 
-    public async Task<List<ImageRecord>> PutImageMaintenanceRequest(List<ImageRecord> imageRecords, string maintenanceRequestId, string registrationNumber) {
-        var maintenanceRequest = await _collection.Find(x => x.RegistrationNumber == registrationNumber).Find()
+    /*
+        public async Task<List<ImageRecord>> PutImageMaintenanceRequest(List<ImageRecord> imageRecords, string maintenanceRequestId, string registrationNumber) {
+            var maintenanceRequest = await _collection.Find(x => x.RegistrationNumber == registrationNumber).Find()
+        }
+
+    }*/
+
+    /*public Task<List<ImageRecord>> PutImageVehicle(List<ImageRecord> imageRecords, string registrationNumber);
+        public Task<List<ImageRecord>> PutImageMaintenanceRequest(List<ImageRecord> imageRecords, string maintenanceRequestId);
+        }*/
+    public async Task<List<ImageRecord>> PutImageMaintenanceRecord(List<ImageRecord> imageRecords,
+    string registrationNumber, int maintenanceRequestIndex, int maintenanceRecordIndex)
+    {
+        MaintenanceRecord maintenanceRecord = await GetMaintenanceRecord(imageRecords, registrationNumber, maintenanceRequestIndex, maintenanceRecordIndex);
+        maintenanceRecord.ImageRecords.AddRange(imageRecords);
+
+        maintenanceRecord = await GetMaintenanceRecord(imageRecords, registrationNumber, maintenanceRequestIndex, maintenanceRecordIndex);
+        return maintenanceRecord.ImageRecords;
     }
 
-}
 
-/*public Task<List<ImageRecord>> PutImageVehicle(List<ImageRecord> imageRecords, string registrationNumber);
-    public Task<List<ImageRecord>> PutImageMaintenanceRequest(List<ImageRecord> imageRecords, string maintenanceRequestId);
-    public Task<List<ImageRecord>> PutImageMaintenanceRecord(List<ImageRecord> imageRecords, string maintenanceRecordId);
-}*/
+    public async Task<MaintenanceRecord> GetMaintenanceRecord(List<ImageRecord> imageRecords, string registrationNumber, int maintenanceRequestIndex, int maintenanceRecordIndex)
+    {
+        Vehicle vehicle = await GetVehicle(registrationNumber);
+        return vehicle.MaintenanceRequests[maintenanceRequestIndex].MaintenanceRecords[maintenanceRecordIndex];
+
+    }
+}
