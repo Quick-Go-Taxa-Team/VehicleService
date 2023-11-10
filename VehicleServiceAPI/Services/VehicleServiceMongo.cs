@@ -44,15 +44,15 @@ public class VehicleServiceMongo : IVehicleService
     public async Task<List<ImageRecord>> PutImageMaintenanceRecord(List<ImageRecord> imageRecords,
     string registrationNumber, int maintenanceRequestIndex, int maintenanceRecordIndex)
     {
-        MaintenanceRecord maintenanceRecord = await GetMaintenanceRecord(imageRecords, registrationNumber, maintenanceRequestIndex, maintenanceRecordIndex);
+        MaintenanceRecord maintenanceRecord = await GetMaintenanceRecord(registrationNumber, maintenanceRequestIndex, maintenanceRecordIndex);
         maintenanceRecord.ImageRecords.AddRange(imageRecords);
 
-        maintenanceRecord = await GetMaintenanceRecord(imageRecords, registrationNumber, maintenanceRequestIndex, maintenanceRecordIndex);
+        maintenanceRecord = await GetMaintenanceRecord(registrationNumber, maintenanceRequestIndex, maintenanceRecordIndex);
         return maintenanceRecord.ImageRecords;
     }
 
 
-    public async Task<MaintenanceRecord> GetMaintenanceRecord(List<ImageRecord> imageRecords, string registrationNumber, int maintenanceRequestIndex, int maintenanceRecordIndex)
+    public async Task<MaintenanceRecord> GetMaintenanceRecord(string registrationNumber, int maintenanceRequestIndex, int maintenanceRecordIndex)
     {
         Vehicle vehicle = await GetVehicle(registrationNumber);
         return vehicle.MaintenanceRequests[maintenanceRequestIndex].MaintenanceRecords[maintenanceRecordIndex];
