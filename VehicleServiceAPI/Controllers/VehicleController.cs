@@ -41,6 +41,7 @@ public class VehicleController : ControllerBase
         return Ok();
     }
 
+    /*
     [HttpPost("{registrationNumber}/images")]
     public async Task<IActionResult> AddImageRecord(string registrationNumber, ImageRecord imageRecord)
     {
@@ -48,5 +49,5 @@ public class VehicleController : ControllerBase
         _logger.LogInformation($"Image record was added to vehicle with registration number {registrationNumber}");
         return Ok();
     }
-
+    */
 }
